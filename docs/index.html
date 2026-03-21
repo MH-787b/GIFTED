@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gifted — Track Gifts with the People You Love</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #faf8f5;
+      color: #2c2420;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .app-icon {
+      width: 120px;
+      height: 120px;
+      border-radius: 28px;
+      box-shadow: 0 8px 30px rgba(216, 90, 48, 0.18);
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.5px;
+    }
+
+    h1 span {
+      color: #D85A30;
+    }
+
+    .tagline {
+      font-size: 1.25rem;
+      color: #6b5e57;
+      margin-bottom: 2.5rem;
+      max-width: 460px;
+      line-height: 1.5;
+    }
+
+    .features {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 3rem;
+      max-width: 640px;
+    }
+
+    .feature {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      width: 180px;
+      text-align: center;
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .feature h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature p {
+      font-size: 0.8rem;
+      color: #6b5e57;
+      line-height: 1.4;
+    }
+
+    .download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: #D85A30;
+      color: #fff;
+      text-decoration: none;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 1rem 2.5rem;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(216, 90, 48, 0.3);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .download-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(216, 90, 48, 0.4);
+    }
+
+    .download-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .note {
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: #9b8e87;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      font-size: 0.8rem;
+      color: #9b8e87;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 2.2rem; }
+      .tagline { font-size: 1.05rem; }
+      .features { gap: 1rem; }
+      .feature { width: 140px; padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+  <main class="hero">
+    <img src="icon.png" alt="Gifted app icon" class="app-icon">
+    <h1><span>Gifted</span></h1>
+    <p class="tagline">Track gifts given and received with the people you love. Never forget a birthday or what you got them last year.</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">&#127873;</div>
+        <h3>Gift Log</h3>
+        <p>Track what you gave and received</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#128101;</div>
+        <h3>People</h3>
+        <p>Keep a list of your loved ones</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon">&#128161;</div>
+        <h3>Ideas</h3>
+        <p>Save gift ideas before you forget</p>
+      </div>
+    </div>
+
+    <a href="gifted.apk" class="download-btn" id="download-link">
+      <svg viewBox="0 0 24 24"><path d="M5 20h14v-2H5v2zm7-18L5.33 8.67l1.42 1.42L11 5.83V16h2V5.83l4.25 4.26 1.42-1.42L12 2z" transform="rotate(180 12 12)"/></svg>
+      Download APK
+    </a>
+    <p class="note">Android only &middot; Enable "Install from unknown sources" in settings</p>
+  </main>
+
+  <footer>
+    &copy; 2026 Gifted
+  </footer>
+</body>
+</html>

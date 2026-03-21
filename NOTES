@@ -1,0 +1,17 @@
+===============================================================================================
+TO RUN LOCAL HOST: 
+cd gifted
+npx expo start
+TO SKIP PERMISSIONS:
+terminal - claude --dangerously-skip-permissions (launching with bypass)
+===============================================================================================
+For the build you decided on React + Vite frontend, Supabase for database and auth, and Vercel for hosting. You're starting with a web app MVP before any native mobile app.
+
+STEP 1:
+
+Set up React Router with 4 pages: Dashboard, People, Gifts, and Ideas. 
+Add a bottom nav bar that links between them. Use a warm coral accent 
+colour (#D85A30). Mobile-first layout, max-width 420px centered. 
+Clean, friendly aesthetic with rounded cards and warm white backgrounds.
+
+
