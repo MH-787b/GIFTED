@@ -107,6 +107,10 @@ npx expo start          # Start dev server (scan QR with Expo Go)
 npx expo start --web    # Run in browser
 ```
 
-## Git
-- Not yet initialised as a git repo (as of March 2026)
-- Plan: push to GitHub, enable GitHub Pages on `/docs` for the landing page
+## Git & GitHub
+- **Repo**: https://github.com/MH-787b/GIFTED.git
+- **Owner**: MH-787b
+- **Branch**: `main`
+- **GitHub Pages**: Enable in Settings → Pages → branch `main`, folder `/docs` → site will be at `https://mh-787b.github.io/GIFTED/`
+- **Note**: The remote has a duplicate copy of app files at root level (from an earlier push) alongside the `gifted/` folder. The local working copy lives in `gifted/`.
+- **Large file warning**: `gifted/gifted-v1.0.0.apk` (84 MB) — consider Git LFS or hosting the APK elsewhere for future builds
