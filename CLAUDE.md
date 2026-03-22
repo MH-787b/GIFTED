@@ -70,3 +70,9 @@ Core features: contacts list, birthday reminders, gift log, balance score.
 - **Gift IDs** — Currently using `Date.now().toString()`. Replace with UUIDs or server-generated IDs when adding a backend.
 - **No confirmation on delete** — `Remove` button deletes immediately with no undo. Consider adding confirmation or undo-toast before shipping.
 - **Edit flow** — Tapping a gift card opens the same modal in edit mode (title says "Edit Gift", button says "Update Gift"). The gift's existing values are pre-filled. Editing updates the gift in-place without changing its ID or createdAt timestamp.
+
+## Building & deployment
+- **EAS Build** — Android APK is built via `npx eas build --platform android --profile preview`. Config in `eas.json` (preview profile outputs APK). Requires `npx eas login` first.
+- **Android package** — `com.m4x99.gifted` (set in `app.json`)
+- **APK hosting** — The built APK is saved to `docs/gifted.apk` and served via GitHub Pages. After rebuilding, replace the APK in `docs/`, commit, and push to update the download.
+- **EAS project** — Linked to Expo account `m4x_99`, project ID `b01fa9f1-e933-4c5f-a4ca-b23b468d0809`.
