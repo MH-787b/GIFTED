@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   StyleSheet,
   ScrollView,
@@ -7,17 +7,12 @@ import {
   TextInput,
   Platform,
   LayoutChangeEvent,
+  PanResponder,
 } from 'react-native';
 import { Text, View } from '@/components/Themed';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from '@/components/useColorScheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  runOnJS,
-} from 'react-native-reanimated';
 
 interface Gift {
   id: string;
@@ -44,6 +39,7 @@ export default function GiftsScreen() {
   const [from, setFrom] = useState('');
   const [price, setPrice] = useState(25);
   const [direction, setDirection] = useState<'given' | 'received'>('received');
+  const [scrollEnabled, setScrollEnabled] = useState(true);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then((data) => {
@@ -102,7 +98,7 @@ export default function GiftsScreen() {
   };
 
   return (
-    <GestureHandlerRootView style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.content}>
         {gifts.length === 0 ? (
           <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
@@ -200,7 +196,7 @@ export default function GiftsScreen() {
             <View style={{ width: 50 }} />
           </View>
 
-          <ScrollView contentContainerStyle={styles.formContent}>
+          <ScrollView contentContainerStyle={styles.formContent} scrollEnabled={scrollEnabled}>
             {/* Direction Toggle */}
             <View style={styles.fieldGroup}>
               <Text style={[styles.label, { color: colors.textMuted }]}>
@@ -318,6 +314,8 @@ export default function GiftsScreen() {
                 trackColor={colors.border}
                 fillColor={Colors.coral}
                 thumbColor={Colors.coral}
+                onSlidingStart={() => setScrollEnabled(false)}
+                onSlidingEnd={() => setScrollEnabled(true)}
               />
               <View style={styles.sliderButtons}>
                 <Pressable
@@ -380,7 +378,7 @@ export default function GiftsScreen() {
           </ScrollView>
         </View>
       </Modal>
-    </GestureHandlerRootView>
+    </View>
   );
 }
 
@@ -393,6 +391,8 @@ function PriceSlider({
   trackColor,
   fillColor,
   thumbColor,
+  onSlidingStart,
+  onSlidingEnd,
 }: {
   value: number;
   onValueChange: (v: number) => void;
@@ -402,67 +402,90 @@ function PriceSlider({
   trackColor: string;
   fillColor: string;
   thumbColor: string;
+  onSlidingStart?: () => void;
+  onSlidingEnd?: () => void;
 }) {
-  const trackWidth = useSharedValue(0);
-  const thumbX = useSharedValue(0);
-  const startX = useSharedValue(0);
+  const trackWidthRef = useRef(0);
+  const trackLeftRef = useRef(0);
 
-  const onLayout = (e: LayoutChangeEvent) => {
-    const w = e.nativeEvent.layout.width;
-    trackWidth.value = w;
-    thumbX.value = ((value - min) / (max - min)) * w;
+  const fraction = max > min ? (value - min) / (max - min) : 0;
+
+  const computePrice = (pageX: number) => {
+    const w = trackWidthRef.current;
+    if (w <= 0) return;
+    const x = pageX - trackLeftRef.current;
+    const ratio = Math.max(0, Math.min(1, x / w));
+    const raw = min + ratio * (max - min);
+    const stepped = Math.round(raw / step) * step;
+    onValueChange(Math.max(min, Math.min(max, stepped)));
   };
 
-  // Sync thumbX when value changes externally (e.g. +/- buttons)
-  useEffect(() => {
-    if (trackWidth.value > 0) {
-      thumbX.value = ((value - min) / (max - min)) * trackWidth.value;
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        onSlidingStart?.();
+        computePrice(evt.nativeEvent.pageX);
+      },
+      onPanResponderMove: (evt) => {
+        computePrice(evt.nativeEvent.pageX);
+      },
+      onPanResponderRelease: () => {
+        onSlidingEnd?.();
+      },
+      onPanResponderTerminate: () => {
+        onSlidingEnd?.();
+      },
+    })
+  ).current;
+
+  const onLayout = (e: LayoutChangeEvent) => {
+    trackWidthRef.current = e.nativeEvent.layout.width;
+    // Measure absolute position for pageX calculations
+    (e.target as any).measureInWindow?.((x: number) => {
+      trackLeftRef.current = x;
+    });
+  };
+
+  const trackRef = useRef<any>(null);
+
+  // Re-measure when modal opens (layout may shift)
+  const handleTrackLayout = (e: LayoutChangeEvent) => {
+    onLayout(e);
+    if (trackRef.current?.measureInWindow) {
+      trackRef.current.measureInWindow((x: number) => {
+        trackLeftRef.current = x;
+      });
     }
-  }, [value, min, max]);
-
-  const updatePrice = useCallback(
-    (x: number) => {
-      if (trackWidth.value <= 0) return;
-      const ratio = Math.max(0, Math.min(1, x / trackWidth.value));
-      const raw = min + ratio * (max - min);
-      const stepped = Math.round(raw / step) * step;
-      const clamped = Math.max(min, Math.min(max, stepped));
-      onValueChange(clamped);
-    },
-    [min, max, step, onValueChange]
-  );
-
-  const pan = Gesture.Pan()
-    .onStart(() => {
-      startX.value = thumbX.value;
-    })
-    .onUpdate((e) => {
-      const newX = Math.max(0, Math.min(trackWidth.value, startX.value + e.translationX));
-      thumbX.value = newX;
-      runOnJS(updatePrice)(newX);
-    })
-    .hitSlop({ top: 20, bottom: 20, left: 10, right: 10 });
-
-  const thumbStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: thumbX.value - 11 }],
-  }));
-
-  const fillStyle = useAnimatedStyle(() => ({
-    width: thumbX.value,
-  }));
+  };
 
   return (
-    <View style={styles.sliderContainer} onLayout={onLayout}>
-      <View style={[styles.sliderTrack, { backgroundColor: trackColor }]}>
-        <Animated.View
-          style={[styles.sliderFill, { backgroundColor: fillColor }, fillStyle]}
+    <View
+      ref={trackRef}
+      style={styles.sliderContainer}
+      onLayout={handleTrackLayout}
+      {...panResponder.panHandlers}
+    >
+      <View style={[styles.sliderTrack, { backgroundColor: trackColor }]} pointerEvents="none">
+        <View
+          style={[
+            styles.sliderFill,
+            { backgroundColor: fillColor, width: `${fraction * 100}%` },
+          ]}
         />
       </View>
-      <GestureDetector gesture={pan}>
-        <Animated.View
-          style={[styles.sliderThumb, { backgroundColor: thumbColor }, thumbStyle]}
-        />
-      </GestureDetector>
+      <View
+        style={[
+          styles.sliderThumb,
+          {
+            backgroundColor: thumbColor,
+            left: `${fraction * 100}%`,
+            marginLeft: -11,
+          },
+        ]}
+        pointerEvents="none"
+      />
     </View>
   );
 }
@@ -642,7 +665,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 4,
-    elevation: 3,
+    elevation: 4,
   },
   sliderButtons: {
     flexDirection: 'row',
