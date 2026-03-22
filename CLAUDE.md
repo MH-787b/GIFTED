@@ -63,12 +63,10 @@ Core features: contacts list, birthday reminders, gift log, balance score.
 
 ## Dependencies beyond Expo defaults
 - `@react-native-async-storage/async-storage` — local data persistence for gifts and ideas
-- `react-native-gesture-handler` — pan gesture for draggable price slider
 
 ## Important notes
 - **State management** — Currently using React `useState` + AsyncStorage (no global state library). When Supabase is integrated, AsyncStorage should be replaced with Supabase queries.
-- **Price slider** — Custom-built using `react-native-gesture-handler` (Pan gesture) + `react-native-reanimated` (animated styles). The `PriceSlider` component lives inside `gifts.tsx` — extract to `components/` if reused elsewhere.
-- **GestureHandlerRootView** — The Gifts screen wraps its root in `GestureHandlerRootView` (required by gesture handler). If gestures are added to other screens, consider moving this to `app/_layout.tsx` instead.
+- **Price slider** — Custom-built using React Native's built-in `PanResponder` (no third-party gesture library). Uses `pageX` + `measureInWindow` for positioning. The `PriceSlider` component lives inside `gifts.tsx` — extract to `components/` if reused elsewhere. The parent ScrollView's `scrollEnabled` is toggled off while dragging to prevent scroll interference.
 - **Gift IDs** — Currently using `Date.now().toString()`. Replace with UUIDs or server-generated IDs when adding a backend.
 - **No confirmation on delete** — `Remove` button deletes immediately with no undo. Consider adding confirmation or undo-toast before shipping.
 - **Edit flow** — Tapping a gift card opens the same modal in edit mode (title says "Edit Gift", button says "Update Gift"). The gift's existing values are pre-filled. Editing updates the gift in-place without changing its ID or createdAt timestamp.
